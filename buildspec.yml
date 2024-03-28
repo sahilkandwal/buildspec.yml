@@ -1,0 +1,25 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto11
+  pre_build:
+    commands:
+      # Update SDK tools
+      - echo "y" | sdkmanager --update
+      # Install required SDK components
+      - echo "y" | sdkmanager "platform-tools" "build-tools;30.0.3" "platforms;android-30"
+      # Install dependencies using Gradle
+      - ./gradlew dependencies
+  build:
+    commands:
+      # Build the Android app
+      - ./gradlew assembleDebug
+  post_build:
+    commands:
+      # Copy the APK file to the build directory
+      - cp app/build/outputs/apk/debug/app-debug.apk $CODEBUILD_SRC_DIR/build/
+artifacts:
+  files:
+    - build/app-debug.apk
